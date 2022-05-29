@@ -2,20 +2,9 @@ import { Component, OnInit , ViewChild , ElementRef } from '@angular/core';
 import { NavController, ModalController, ToastController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { NativeGeocoder, NativeGeocoderResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { SearchmodalPage } from '../searchmodal/searchmodal.page';
 import { CalendarmodalPage } from '../calendarmodal/calendarmodal.page';
 import { format , parseISO } from "date-fns";
-
-import {
-  GoogleMaps,
-  GoogleMap,
-  GoogleMapsEvent,
-  Marker,
-  GoogleMapsAnimation,
-  MyLocation
-} from '@ionic-native/google-maps/ngx';
 
 declare var google;
 
@@ -25,8 +14,6 @@ declare var google;
   styleUrls: ['./searchresult.page.scss'],
 })
 export class SearchresultPage implements OnInit {
-  @ViewChild('map', { static: false }) mapElement: ElementRef;
-  map: any;
   latitude: number;
   longitude: number;
   markers: any;
@@ -40,7 +27,6 @@ export class SearchresultPage implements OnInit {
   dateString: any;
   time: any;
   expand: boolean = false;
-  // map: GoogleMap;
   marker: any ;
   address: string;
   address2: string;
@@ -57,8 +43,6 @@ export class SearchresultPage implements OnInit {
     private toastCtrl: ToastController,
     private http: HttpClient,
     private router: Router,
-    private nativeGeocoder: NativeGeocoder,
-    private geolocation: Geolocation,
     private platform: Platform
   ) { }
 
@@ -107,14 +91,6 @@ export class SearchresultPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.platform.ready().then(() => {
-      if(localStorage.getItem('location') != null){
-        var location = localStorage.getItem('location');
-        this.latLng = JSON.parse(location);
-        this.getAddressFromCoords(this.latLng.lat, this.latLng.lng);
-      }
-      this.loadMap();
-    });    
   }
 
   searchResult(ss_id, name, key){
@@ -159,112 +135,6 @@ export class SearchresultPage implements OnInit {
   onScroll(event) {
     this.expand = false;
   }
-
-  // loadMap() {    
-  //   this.map = GoogleMaps.create("map", {
-  //      camera: {
-  //         target: {
-  //           lat: this.latLng.lat,
-  //           lng: this.latLng.lng
-  //         },
-  //         zoom: 17,
-  //         tilt: 30
-  //     }
-  //   });
-  //   this.map.on(GoogleMapsEvent.MAP_READY).subscribe(
-  //     (data) => {
-  //         console.log("Click MAP",data);
-  //     }
-  //   );
-  // }
-
-  loadMap() {
-    this.geolocation.getCurrentPosition().then((resp) => {
-     this.latitude = resp.coords.latitude;
-     this.longitude = resp.coords.longitude;
-
-     let latLng = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
-     let mapOptions = {
-       center: latLng,
-       zoom: 15,
-       mapTypeId: google.maps.MapTypeId.ROADMAP
-     }
-      
- 
-     this.getAddressFromCoords(resp.coords.latitude, resp.coords.longitude);
-
-     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
-
-     this.map.addListener('dragend', () => {
-
-       this.latitude = this.map.center.lat();
-       this.longitude = this.map.center.lng();
-
-       this.getAddressFromCoords(this.map.center.lat(), this.map.center.lng())
-
-       
- 
-     });
-
-     let pos = {
-       lat: resp.coords.latitude,
-       lng: resp.coords.longitude
-     };
-     let marker = new google.maps.Marker({
-       position: pos,
-       map: this.map,
-       title: 'I am here!',
-       // animation:google.maps.Animation.BOUNCE
-     });
-    //  this.markers.push(marker);
-     this.map.setCenter(pos);
-
-   }).catch((error) => {
-     console.log('Error getting location', error);
-   });
- }
-
-  getAddressFromCoords(lattitude, longitude) {
-    console.log("getAddressFromCoords " + lattitude + " " + longitude);
-    let options: NativeGeocoderOptions = {
-      useLocale: true,
-      maxResults: 5
-    };
-
-    this.nativeGeocoder.reverseGeocode(lattitude, longitude, options)
-      .then((result: NativeGeocoderResult[]) => {
-        console.log( "location result =====>" ,  JSON.stringify(result));
-        this.address = "";
-        this.address2 = "";
-        let responseAddress = [];
-        let countryname=[] ;
-        for (let [key, value] of Object.entries(result[0].locality )) {
-          if (value.length > 0)
-            responseAddress.push(value);
-        }
-        for (let [key, data] of Object.entries(result[0].countryName)) {
-          if (data.length > 0)
-            countryname.push(data);
-        }
-        for (let value of countryname) {
-          this.address2 += value;
-        }
-        this.country = this.address2;
-
-        console.log(responseAddress);        
-        // responseAddress.reverse();
-        for (let value of responseAddress) {
-          this.address += value;
-        }
-        // this.address = this.address.slice(0, -2);
-        this.city = this.address;
-      })
-      .catch((error: any) => {
-        this.address = "Address Not Available!";
-      });
-
-  }
-
 
   async searchbar() {
     this.expand = true

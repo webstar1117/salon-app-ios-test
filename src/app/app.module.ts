@@ -9,7 +9,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SearchmodalPageModule } from './searchmodal/searchmodal.module';
 import { PaysuccessPageModule } from './modals/paysuccess/paysuccess.module';
-import { GoogleMaps } from '@ionic-native/google-maps';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
 import { ApplePay } from '@ionic-native/apple-pay/ngx'
@@ -32,7 +31,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
   AngularFireModule.initializeApp(environment.firebaseConfig),  
   AngularFirestoreModule,        
 ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, GoogleMaps, Geolocation, NativeGeocoder, NavParams, ApplePay, Stripe , Camera, InAppBrowser],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay, Stripe , Camera, InAppBrowser],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

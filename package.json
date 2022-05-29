@@ -35,7 +35,6 @@
     "@ionic-native/core": "^5.36.0",
     "@ionic-native/facebook": "^5.36.0",
     "@ionic-native/geolocation": "^5.36.0",
-    "@ionic-native/google-maps": "^5.5.0",
     "@ionic-native/in-app-browser": "^5.36.0",
     "@ionic-native/ionic-webview": "^5.22.0-beta-1",
     "@ionic-native/native-geocoder": "^5.36.0",
@@ -88,8 +87,6 @@
     "cordova-plugin-camera": "^6.0.0",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-facebook-connect": "^3.2.0",
-    "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git#multiple_maps",
-    "cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
     "cordova-plugin-ionic-webview": "^5.0.0",
     "cordova-plugin-splashscreen": "^5.0.2",
@@ -125,10 +122,6 @@
         "LOCATION_WHEN_IN_USE_DESCRIPTION": "Use geocoder service"
       },
       "cordova-plugin-sign-in-with-apple": {},
-      "cordova-plugin-googlemaps": {
-        "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
-        "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
-      },
       "cordova-plugin-stripe": {},
       "cordova-plugin-applepay": {},
       "cordova-plugin-facebook-connect": {
