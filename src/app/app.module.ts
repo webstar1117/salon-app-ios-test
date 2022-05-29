@@ -12,7 +12,6 @@ import { PaysuccessPageModule } from './modals/paysuccess/paysuccess.module';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
 import { ApplePay } from '@ionic-native/apple-pay/ngx'
-import { Stripe } from '@awesome-cordova-plugins/stripe/ngx';
 
 import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
@@ -31,7 +30,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
   AngularFireModule.initializeApp(environment.firebaseConfig),  
   AngularFirestoreModule,        
 ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay, Stripe , Camera, InAppBrowser],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay , Camera, InAppBrowser],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -3,7 +3,6 @@ import { NavController, ModalController, NavParams, ToastController, LoadingCont
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CalendarMode, Step } from 'ionic2-calendar/calendar';
 import { ApplePay } from '@ionic-native/apple-pay/ngx'
-import { Stripe } from '@awesome-cordova-plugins/stripe/ngx';
 import { PaymentmodalPage } from '../paymentmodal/paymentmodal.page';
 
 @Component({
@@ -60,7 +59,6 @@ export class AppointmentmodalPage implements OnInit {
     private loadingCtrl: LoadingController,
     private http: HttpClient,
     private applePay: ApplePay,
-    private stripe: Stripe,
   ) { }
  
   ngOnInit() {
@@ -346,124 +344,7 @@ export class AppointmentmodalPage implements OnInit {
 
   
   async visaPay(){
-    this.stripe.setPublishableKey('pk_test_51JwyVGEDfScRvyn3VD4lrKiNBkdBVvFZjV1XKQeKcBWBUr6Yp9kAIf3dsqWmeXLLkCeufUJmTuVGFlY95Kirakv300Czfe5zDT');
-    // this.stripe.setPublishableKey('pk_live_51JwyVGEDfScRvyn3j8YQM4l9uTTKZlz0TLWacwe9eXH7mc5KDBlVSk99nuoL8BhQDb7N0dtNpGRy0ayilZ7p2v3R00ODJoMc4F');
-    var token = localStorage.getItem('token');
-    let card;
-
-    const loading = await this.loadingCtrl.create({
-      spinner: 'bubbles',
-      cssClass: 'loading',
-      message: 'Checking...',
-    });
-    loading.present();
-
-    this.http.get(this.apiUrl+"card/get-default?api_token=" + token)
-    .subscribe(res => {
-      if(res["status"] == 200){
-        if(res["data"] != null){
-          var expire = res["data"].expired_at;
-          expire = expire.split("/");
-          card = {
-            number: res["data"].number,
-            expMonth: expire[0],
-            expYear: "20"+expire[1],
-            cvc: res["data"].last_digit
-          }
-          this.stripe.createCardToken(card)
-          .then((token) => {
-            var params = {
-              stripeToken: token.id,
-              amount: this.total_price
-            };
-            this.http.post(this.apiUrl+"stripe-payment-test", JSON.stringify(params), this.httpOptions)
-            .subscribe(res => {
-              if(res["status"] == 200){
-                if(res["data"][0].status == "succeeded"){
-                  if(this.multi == false){
-                    var data = {
-                      api_token: localStorage.getItem('token'),
-                      professional_id: this.professional_id,
-                      service_id: this.service_id,
-                      salon_id: this.salon_id,
-                      year: this.date.toLocaleDateString("en-US", { year: 'numeric'}),
-                      month: this.date.toLocaleDateString("en-US", { month: 'long' }),
-                      date: this.date.toLocaleDateString("en-US", { day: 'numeric' }),
-                      day: this.date.toLocaleDateString("en-US", { weekday: 'long' }),
-                      time: this.datas[0].time,
-                      price: this.orginal_price,
-                      tip: this.tip_price,
-                      tax: 0
-                    }
-                    this.http.post(this.apiUrl+"appointment/add", JSON.stringify(data), this.httpOptions)
-                    .subscribe(res => {
-                      loading.dismiss();
-                      if(res["status"] == 200){
-                        this.paymentSuccess();
-                        this.modalCtrl.dismiss();
-                      }else{
-                        this.toastMessage("Failed to add data");
-                      }
-                    }, (err) => {
-                      console.log(err);
-                    });
-                  }else{
-                    let multidata = []; 
-                    for(var i in this.datas){
-                      let data = {
-                        professional_id: this.datas[i]["professional"]["id"],
-                        service_id: this.datas[i]["service"]["id"],
-                        salon_id: this.datas[i]["service"]["salon_id"],
-                        year: this.datas[i]["date"].toLocaleDateString("en-US", { year: 'numeric'}),
-                        month: this.datas[i]["date"].toLocaleDateString("en-US", { month: 'long' }),
-                        date: this.datas[i]["date"].toLocaleDateString("en-US", { day: 'numeric' }),
-                        day: this.datas[i]["date"].toLocaleDateString("en-US", { weekday: 'long' }),
-                        time: this.datas[i].time,
-                        price: this.datas[i]["service"]["price"],
-                        tip: this.tip_price,
-                        tax: 0
-                      }
-                      multidata.push(data);
-                    }
-                    let requestData = {
-                      api_token: localStorage.getItem('token'),
-                      data: multidata
-                    }
-                    this.http.post(this.apiUrl+"appointment/add-multi", JSON.stringify(requestData), this.httpOptions)
-                    .subscribe(res => {
-                      loading.dismiss();
-                      if(res["status"] == 200){
-                        this.paymentSuccess();
-                        this.modalCtrl.dismiss();
-                      }else{
-                        this.toastMessage("Failed to add data");
-                      }
-                    }, (err) => {
-                      console.log(err);
-                    });
-                  }
-                }
-              }else{
-                this.toastMessage(res["message"]);
-                loading.dismiss();
-              }
-            }, (err) => {
-              console.log(err);
-              loading.dismiss();
-            });
-          }).catch(error => console.log(error));
-        }else{
-          this.toastMessage('You set no card as a default.');
-          loading.dismiss();
-        }
-      }else{
-        this.toastMessage('You set no card as a default.')
-        loading.dismiss();
-      }
-    }, (err) => {
-      console.log(err);
-      loading.dismiss();
-    });   
+  
   }
 
   async paymentSuccess(){

@@ -260,7 +260,6 @@
         <variable name="APP_NAME" value="Hairday" />
     </plugin>
     <plugin name="cordova-plugin-nativegeocoder" spec="^3.4.1" />
-    <plugin name="cordova-plugin-stripe" spec="^1.5.3" />
     <plugin name="cordova-plugin-applepay" spec="^5.0.0" />
     <plugin name="cordova-plugin-sign-in-with-apple" spec="^0.1.2" />
 </widget>
