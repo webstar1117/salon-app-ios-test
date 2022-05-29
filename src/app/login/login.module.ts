@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
-import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { Facebook } from '@ionic-native/facebook/ngx';
 import { SignInWithApple } from "@ionic-native/sign-in-with-apple/ngx";
 
@@ -21,6 +20,6 @@ import { LoginPage } from './login.page';
     LoginPageRoutingModule
   ],
   declarations: [LoginPage],
-  providers: [GooglePlus, Facebook, SignInWithApple]
+  providers: [Facebook, SignInWithApple]
 })
 export class LoginPageModule {}

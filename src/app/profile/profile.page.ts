@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { GooglePlus } from '@ionic-native/google-plus/ngx';
 import { Facebook } from '@ionic-native/facebook/ngx';
 
 @Component({
@@ -18,7 +17,7 @@ export class ProfilePage implements OnInit {
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
   };
-  constructor(private navCtrl: NavController, private http: HttpClient, private googlePlus: GooglePlus, private fb: Facebook) { }
+  constructor(private navCtrl: NavController, private http: HttpClient,  private fb: Facebook) { }
 
   ngOnInit() {  }
 
@@ -91,25 +90,7 @@ export class ProfilePage implements OnInit {
     }
     if(localStorage.getItem("social") != null){
       if(localStorage.getItem("social") == "google"){
-        this.googlePlus.trySilentLogin({}).then(res => {
-          this.googlePlus.logout().then(res => {
-            // user logged out so we will remove him from the NativeStorage
-            localStorage.removeItem("social");
-            localStorage.removeItem("token");
-            this.navCtrl.navigateRoot('login');
-          }).catch(error => {
-            console.log(error);
-          });
-        }).catch(error => {
-          this.googlePlus.disconnect().then(res => {
-            localStorage.removeItem("social");
-            localStorage.removeItem("token");
-            this.navCtrl.navigateRoot('login');
-          }).catch(error => {
-            console.log(error);
-          });
-          console.log(error);
-        });
+      
       }else if(localStorage.getItem("social") == "facebook"){
         this.fb.logout()
         .then(res => {
