@@ -19,7 +19,7 @@
     <h3 class="ion-text-center" *ngIf="!hasImage">We’ll need access to your photo library to change profile image   </h3>
   </div>
 
-  <input id="photo" type="file" style="display: none" (change)="saveImage($event)" accept="image/*"/>
+  <input id="photo" type="file" style="display: none" (change)="saveImage($event)" accept="image/*, .heic, .heif"/>
 
   <div class="bottom">
     <ion-button (click)="nextStep()">Continue</ion-button>
