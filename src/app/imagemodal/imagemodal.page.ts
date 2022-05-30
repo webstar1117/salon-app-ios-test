@@ -189,6 +189,7 @@ export class ImagemodalPage implements OnInit {
     
         this.http.post(this.apiUrl+"profile/change-image", formData)
           .subscribe(res => {
+            console.log('profile-res:'+JSON.stringify(res))
             if(res["status"] == 200){
               this.toastMessage(res["message"]);
               this.modalCtrl.dismiss();
@@ -198,7 +199,7 @@ export class ImagemodalPage implements OnInit {
               }
             }
           }, (err) => {
-            console.log(err);
+            console.log('profile-err:'+JSON.stringify(err));
           });
         }
     }else if(this.type == 'business' || this.type == 'professional' || this.type == "portfolio" || this.type == "review"){
