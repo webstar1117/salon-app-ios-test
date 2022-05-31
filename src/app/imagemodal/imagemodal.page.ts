@@ -3,17 +3,12 @@ import { NavController, ModalController, NavParams, ToastController, Platform } 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera/ngx';
 import { ActionSheetController } from '@ionic/angular';
-import heic2any from "heic2any";
-
-
-
 
 @Component({
   selector: 'app-imagemodal',
   templateUrl: './imagemodal.page.html',
   styleUrls: ['./imagemodal.page.scss'],
 })
-
 
 
 export class ImagemodalPage implements OnInit {
@@ -66,11 +61,6 @@ export class ImagemodalPage implements OnInit {
     }
   }
 
-  // uploadImage(){
-  //   let btn = document.getElementById('photo');
-  //   btn.click();
-  // }
-
   async presentActionSheet() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Select',
@@ -101,96 +91,56 @@ export class ImagemodalPage implements OnInit {
 
   cameraImage() {
     this.camera.getPicture(this.optionsForCamera).then((imageData) => {
-      // imageData is either a base64 encoded string or a file URI
-      // If it's base64 (DATA_URL):
-      console.log("imageData =======>", imageData);
       let base64Image = 'data:image/jpeg;base64,' + imageData;
       this.avatarUrl = base64Image;
       this.hasImage = true;
-      this.saveImage(base64Image);
+      this.image=base64Image;
     }, (err) => {
-      // Handle error
+
       console.log(err);
 
     });
   }
+  
   photoFile() {
-    this.camera.getPicture(this.optionsForPhotoFile).then((imageData) => {
-      // imageData is either a base64 encoded string or a file URI
-      // If it's base64 (DATA_URL):
-      console.log("imageData =======>", imageData);
+    this.camera.getPicture(this.optionsForPhotoFile).then((imageData) => {  
       let base64Image = 'data:image/jpeg;base64,' + imageData;
       this.avatarUrl = base64Image;
       this.hasImage = true;
-      this.saveImage(base64Image);
+      this.image=base64Image;
     }, (err) => {
-      // Handle error
       console.log(err);
-
     });
   }
 
-
-  saveImage(event) {
-    this.image = event;
-    this.readFile(this.image[0]);
-    //if the image format is heic ===>
-    var heicImage = event.target.value;
-    var fileNameExt = heicImage.substr(heicImage.lastIndexOf('.') + 1);
-    if (fileNameExt == "heic") {
-      var blob = event.target.files[0]; //ev.target.files[0];
-      let that = this;
-      heic2any({
-        blob: blob,
-        toType: "image/jpg",
-      }).then(function (resultBlob) {
-        let container = new DataTransfer();
-        let file = new File([resultBlob as BlobPart], "heic" + ".jpg", { type: "image/jpeg", lastModified: new Date().getTime() });
-        container.items.add(file);
-
-        that.image.files = container.files;
-      });
-    }
-  }
 
   readFile(data) {
     let reader = new FileReader();
     const file = data;
     reader.readAsDataURL(file);
     reader.onload = (_event) => {
-      const imageFile = _event.target.result;
-      console.log("imageFile =====> ", imageFile);
+      this.image = _event.target.result;
       this.avatarUrl = file.name;
       this.hasImage = true;
     }
   }
 
-  dataURLtoFile(dataurl, filename) {
-
-    var arr = dataurl.split(','),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n);
-
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
+  dataURItoBlob(dataURI) {
+    const byteString = window.atob(dataURI);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const int8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+      int8Array[i] = byteString.charCodeAt(i);
     }
-
-    return new File([u8arr], filename, { type: mime });
-  }
-
-
-
+    const blob = new Blob([int8Array], { type: 'image/png' });    
+    return blob;
+ }
+ 
 
   nextStep() {
-
-    const filename = ` hairday_profile_images.jpg}`
-
-    const imageData = this.dataURLtoFile(this.image, filename);
-
-    console.log("this image", imageData);
-
+    const filename = 'hairday_profile_images_new.jpeg'
+    const blobdata = this.dataURItoBlob(this.image)
+    const imageData = new File([blobdata], filename, { type: 'image/jpeg' });
     if (this.type == 'profile') {
       if (this.image == undefined) {
         this.toastMessage('Please upload profile image');
