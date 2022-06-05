@@ -121,6 +121,7 @@ export class ImagemodalPage implements OnInit {
     reader.onload = (_event) => {
       this.image = _event.target.result;
       this.avatarUrl = file.name;
+      console.log('filename',file.name)
       this.hasImage = true;
     }
   }
