@@ -126,10 +126,10 @@ export class ImagemodalPage implements OnInit {
   }
 
   dataURItoBlob(dataURI) {
+    this.toastMessage(1);
     const byteString = window.atob(dataURI);
-    console.log('byteString',byteString)
+    this.toastMessage(2);
     const arrayBuffer = new ArrayBuffer(byteString.length);
-
     const int8Array = new Uint8Array(arrayBuffer);
 
     for (let i = 0; i < byteString.length; i++) {
