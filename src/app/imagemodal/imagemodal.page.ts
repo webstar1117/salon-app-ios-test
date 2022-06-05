@@ -139,19 +139,22 @@ export class ImagemodalPage implements OnInit {
 
   nextStep() {
     const filename = 'hairday_profile_images_new.jpeg'
+    this.toastMessage(1);
     const blobdata = this.dataURItoBlob(this.image)
     const imageData = new File([blobdata], filename, { type: 'image/jpeg' });
     if (this.type == 'profile') {
+      this.toastMessage(2);
       if (this.image == undefined) {
         this.toastMessage('Please upload profile image');
       } else {
+        this.toastMessage(3);
         let formData = new FormData();
         formData.append("api_token", localStorage.getItem('token'));
         formData.append("image", imageData);
 
         this.http.post(this.apiUrl + "profile/change-image", formData)
           .subscribe(res => {
-            console.log('res')
+            this.toastMessage('res:'+JSON.stringify(res));
             if (res["status"] == 200) {
               this.toastMessage(res["message"]);
               this.modalCtrl.dismiss();
@@ -161,6 +164,7 @@ export class ImagemodalPage implements OnInit {
               }
             }
           }, (err) => {
+            this.toastMessage('err:'+JSON.stringify(err));
             console.log(err);
           });
       }
