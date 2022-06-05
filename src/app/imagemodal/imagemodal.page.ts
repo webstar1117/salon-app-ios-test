@@ -139,7 +139,6 @@ export class ImagemodalPage implements OnInit {
 
   nextStep() {
     const filename = 'hairday_profile_images_new.jpeg'
-    this.toastMessage(1);
     const blobdata = this.dataURItoBlob(this.image)
     const imageData = new File([blobdata], filename, { type: 'image/jpeg' });
     if (this.type == 'profile') {
