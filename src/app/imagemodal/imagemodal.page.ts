@@ -127,14 +127,17 @@ export class ImagemodalPage implements OnInit {
 
   dataURItoBlob(dataURI) {
     const byteString = window.atob(dataURI);
+    console.log('byteString',byteString)
     const arrayBuffer = new ArrayBuffer(byteString.length);
+
     const int8Array = new Uint8Array(arrayBuffer);
-    this.toastMessage('int8Array:'+JSON.stringify(int8Array) );
 
     for (let i = 0; i < byteString.length; i++) {
       int8Array[i] = byteString.charCodeAt(i);
     }
-    const blob = new Blob([int8Array], { type: 'image/png' });    
+    const blob = new Blob([int8Array], { type: 'image/png' });
+    console.log('blob',blob)
+    
     return blob;
  }
  
@@ -142,7 +145,6 @@ export class ImagemodalPage implements OnInit {
   nextStep() {
     const filename = 'hairday_profile_images_new.jpeg'
     const blobdata = this.dataURItoBlob(this.image);
-    this.toastMessage('blobdata:'+JSON.stringify(blobdata));
 
     const imageData = new File([blobdata], filename, { type: 'image/jpeg' });
     if (this.type == 'profile') {
