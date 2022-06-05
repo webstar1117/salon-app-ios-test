@@ -148,7 +148,8 @@ async nextStep() {
 
     const base64Response = await fetch(this.image);
     const blobdata = await base64Response.blob();
-    
+    console.log('blobdata',blobdata)
+
     const imageData = new File([blobdata], filename, { type: 'image/jpeg' });
     if (this.type == 'profile') {
       if (this.image == undefined) {
