@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, ModalController, NavParams, ToastController, Platform } from '@ionic/angular';
+import { NavController, ModalController, NavParams, ToastController , Platform} from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera/ngx';
 import { ActionSheetController } from '@ionic/angular';
+
+
+
+
 
 @Component({
   selector: 'app-imagemodal',
@@ -11,9 +15,10 @@ import { ActionSheetController } from '@ionic/angular';
 })
 
 
+
 export class ImagemodalPage implements OnInit {
 
-  avatarUrl: any;
+  avatarUrl:any;
   hasImage: boolean = false;
   image: any = [];
   type: any;
@@ -32,6 +37,8 @@ export class ImagemodalPage implements OnInit {
     destinationType: this.camera.DestinationType.DATA_URL,
     sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
   }
+  
+
 
 
   constructor(
@@ -40,33 +47,39 @@ export class ImagemodalPage implements OnInit {
     private navParams: NavParams,
     private http: HttpClient,
     private toastCtrl: ToastController,
-    private camera: Camera,
+    private camera : Camera,
     public actionSheetController: ActionSheetController,
     private platform: Platform,
 
   ) { }
-
+ 
   ngOnInit() {
     var avatar = this.navParams.get('avatar');
     this.type = this.navParams.get('type');
-    if (avatar != null) {
-      if (this.type == 'profile') {
-        this.avatarUrl = 'https://hairday.app/assets/images/avatars/' + avatar;
+    console.log("type==>", this.type);
+    if(avatar != null){
+      if(this.type == 'profile'){
+        this.avatarUrl = 'https://hairday.app/assets/images/avatars/'+avatar;
         this.hasImage = true;
-      } else {
+      }else{
         this.readFile(avatar);
       }
-    } else {
+    }else{
       this.avatarUrl = 'assets/imgs/noImage.png';
     }
   }
+
+  // uploadImage(){
+  //   let btn = document.getElementById('photo');
+  //   btn.click();
+  // }
 
   async presentActionSheet() {
     const actionSheet = await this.actionSheetController.create({
       header: 'Select',
       cssClass: 'my-custom-class',
       animated: true,
-      mode: !this.platform.is('ios') ? "md" : "ios",
+      mode: !this.platform.is('ios') ? "md" :"ios",
       buttons: [{
         text: 'Camera',
         role: 'destructive',
@@ -81,7 +94,7 @@ export class ImagemodalPage implements OnInit {
           this.photoFile();
         }
       }],
-
+      
     });
     await actionSheet.present();
 
@@ -89,129 +102,146 @@ export class ImagemodalPage implements OnInit {
     console.log('onDidDismiss resolved with role and data', role, data);
   }
 
-  cameraImage() {
+
+
+
+
+   
+  cameraImage(){
     this.camera.getPicture(this.optionsForCamera).then((imageData) => {
-      let base64Image = 'data:image/jpeg;base64,' + imageData;
-      this.avatarUrl = base64Image;
-      this.hasImage = true;
-      this.image=base64Image;
-    }, (err) => {
-
+      // imageData is either a base64 encoded string or a file URI
+      // If it's base64 (DATA_URL):
+      console.log("imageData =======>" , imageData);
+        let base64Image = 'data:image/jpeg;base64,' + imageData;
+        this.avatarUrl = base64Image;
+        this.hasImage = true;
+        this.saveImage(base64Image);
+     }, (err) => {
+      // Handle error
       console.log(err);
-
-    });
+      
+     });
   }
-  
-  photoFile() {
-    this.camera.getPicture(this.optionsForPhotoFile).then((imageData) => {  
-      let base64Image = 'data:image/jpeg;base64,' + imageData;
-      this.avatarUrl = base64Image;
-      this.hasImage = true;
-      this.image=base64Image;
-    }, (err) => {
+  photoFile(){
+    this.camera.getPicture(this.optionsForPhotoFile).then((imageData) => {
+      // imageData is either a base64 encoded string or a file URI
+      // If it's base64 (DATA_URL):
+      console.log("imageData =======>" , imageData);
+        let base64Image = 'data:image/jpeg;base64,' + imageData;
+        this.avatarUrl = base64Image;
+        this.hasImage = true;
+        this.saveImage(base64Image);
+     }, (err) => {
+      // Handle error
       console.log(err);
-    });
+      
+     });
+  }
+   
+
+  saveImage(event){
+    this.image = event;
+    console.log(this.image);
+    this.readFile(this.image[0]);
   }
 
-
-  readFile(data) {
+  readFile(data){
     let reader = new FileReader();
     const file = data;
     reader.readAsDataURL(file);
-    reader.onload = (_event) => {
-      this.image = _event.target.result;
+    reader.onload = (_event) => { 
+      const imageFile = _event.target.result;
+      console.log("imageFile =====> " , imageFile);
       this.avatarUrl = file.name;
-      console.log('filename',file.name)
       this.hasImage = true;
     }
   }
 
-  dataURItoBlob(dataURI) {
-    this.toastMessage(1);
-    const byteString = window.atob(dataURI);
-    this.toastMessage(2);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const int8Array = new Uint8Array(arrayBuffer);
-
-    for (let i = 0; i < byteString.length; i++) {
-      int8Array[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([int8Array], { type: 'image/png' });
-    console.log('blob',blob)
-    
-    return blob;
- }
+  dataURLtoFile(dataurl, filename) {
  
+    var arr = dataurl.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), 
+        n = bstr.length, 
+        u8arr = new Uint8Array(n);
+        
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    
+    return new File([u8arr], filename, {type:mime});
+}
 
-async nextStep() {
-    const filename = 'hairday_profile_images_new.jpeg'
-    // const blobdata = this.dataURItoBlob(this.image);
 
-    const base64Response = await fetch(this.image);
-    const blobdata = await base64Response.blob();
-    console.log('blobdata',blobdata)
 
-    const imageData = new File([blobdata], filename, { type: 'image/jpeg' });
-    if (this.type == 'profile') {
-      if (this.image == undefined) {
+
+  nextStep(){
+    
+    const filename = ` hairday_profile_images.jpg}`
+
+    const imageData =   this.dataURLtoFile(this.image , filename );
+
+    console.log("this image" , imageData);
+    
+    if(this.type == 'profile'){
+      if(this.image == undefined){
         this.toastMessage('Please upload profile image');
-      } else {
+      }else{
         let formData = new FormData();
         formData.append("api_token", localStorage.getItem('token'));
         formData.append("image", imageData);
-
-        this.http.post(this.apiUrl + "profile/change-image", formData)
+    
+        this.http.post(this.apiUrl+"profile/change-image", formData)
           .subscribe(res => {
-            this.toastMessage('res:'+JSON.stringify(res));
-            if (res["status"] == 200) {
+            if(res["status"] == 200){
               this.toastMessage(res["message"]);
               this.modalCtrl.dismiss();
-            } else {
-              for (let key in res["message"]) {
+            }else{
+              for(let key in res["message"]){
                 this.toastMessage(res["message"][key]);
               }
             }
           }, (err) => {
-            this.toastMessage('err:'+JSON.stringify(err));
             console.log(err);
           });
-      }
-    } else if (this.type == 'business' || this.type == 'professional' || this.type == "portfolio" || this.type == "review") {
-      this.modalCtrl.dismiss({ avatar: imageData, avatarUrl: this.image });
-    } else if (this.type == 'salon') {
+        }
+    }else if(this.type == 'business' || this.type == 'professional' || this.type == "portfolio" || this.type == "review"){
+      this.modalCtrl.dismiss({avatar: imageData, avatarUrl: this.image});
+    }else if(this.type == 'salon'){
       var salon_id = this.navParams.get('salon_id');
-      if (this.image == undefined) {
+      if(this.image == undefined){
         this.toastMessage('Please upload salon image');
-      } else {
+      }else{
         let formData = new FormData();
         formData.append("salon_id", salon_id);
-        formData.append("image", imageData);
-        this.http.post(this.apiUrl + "business/upload-business-image", formData)
+        formData.append("image", imageData);  
+        this.http.post(this.apiUrl+"business/upload-business-image", formData)
           .subscribe(res => {
-            if (res["status"] == 200) {
+            if(res["status"] == 200){
               this.toastMessage(res["message"]);
               this.modalCtrl.dismiss();
-            } else {
-              if (Array.isArray(res["message"])) {
-                for (let key in res["message"]) {
+            }else{
+              if(Array.isArray(res["message"])){
+                for(let key in res["message"]){
                   this.toastMessage(res["message"][key]);
                 }
-              } else {
+              }else{
                 this.toastMessage(res["message"]);
               }
             }
           }, (err) => {
             console.log(err);
           });
-      }
+        }
     }
   }
 
-  close() {
-    this.modalCtrl.dismiss({ avatar: null });
+  close()
+  {
+    this.modalCtrl.dismiss({avatar: null});
   }
 
-  async toastMessage(msg) {
+  async toastMessage(msg){
     const toast = await this.toastCtrl.create({
       message: msg,
       cssClass: 'ion-text-center',
