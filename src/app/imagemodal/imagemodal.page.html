@@ -22,7 +22,7 @@
   <input id="photo" type="file" style="display: none" (change)="saveImage($event)" accept="image/*, .heic, .heif"/>
 
   <div class="bottom">
-    <ion-button (click)="nextStep()" [disable]="isSending">Continue</ion-button>
+    <ion-button (click)="nextStep($event)" [disable]="isSending">Continue</ion-button>
   </div>
 
 </ion-content>
