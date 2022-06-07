@@ -30,10 +30,11 @@
     </div>
 
     <h2>Phone number</h2>
-    <div class="input-item">
+    <div class="input-holder">
       <ion-item lines="none">
-        <ion-input type="number" placeholder="+144 222 4567" [(ngModel)]="phone"></ion-input>
+        <ion-input type="text" placeholder="144 222 4567" [(ngModel)]="phone" (keyup)="edit($event)"></ion-input>
       </ion-item>
+      <p class="error" *ngIf="!isPhone">Please enter a valid phone number</p>
     </div>
   </div>
 
