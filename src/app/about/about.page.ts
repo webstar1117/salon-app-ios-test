@@ -117,13 +117,9 @@ export class AboutPage implements OnInit {
         this.toastMessage(res["message"]);
         this.navCtrl.navigateBack('businessprofile');
       }else{
-        if(Array.isArray(res["message"])){
           for(let key in res["message"]){
             this.toastMessage(res["message"][key]);
           }
-        }else{
-          this.toastMessage(res["message"]);
-        }
       }
     }, (err) => {
       console.log(err);

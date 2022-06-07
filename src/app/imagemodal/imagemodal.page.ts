@@ -22,6 +22,7 @@ export class ImagemodalPage implements OnInit {
   hasImage: boolean = false;
   image: any = [];
   type: any;
+  isSending: boolean=false;
   apiUrl = 'https://hairday.app/api/';
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -75,6 +76,7 @@ export class ImagemodalPage implements OnInit {
   // }
 
   async presentActionSheet() {
+    this.isSending = false;
     const actionSheet = await this.actionSheetController.create({
       header: 'Select',
       cssClass: 'my-custom-class',
@@ -182,6 +184,8 @@ export class ImagemodalPage implements OnInit {
     const imageData =   this.dataURLtoFile(this.image , filename );
 
     console.log("this image" , imageData);
+
+    this.isSending = true;
     
     if(this.type == 'profile'){
       if(this.image == undefined){
@@ -195,7 +199,7 @@ export class ImagemodalPage implements OnInit {
           .subscribe(res => {
             if(res["status"] == 200){
               this.toastMessage(res["message"]);
-              this.modalCtrl.dismiss();
+              this.modalCtrl.dismiss({avatarUrl: this.image});
             }else{
               for(let key in res["message"]){
                 this.toastMessage(res["message"][key]);

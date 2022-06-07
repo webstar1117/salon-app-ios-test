@@ -47,7 +47,7 @@ export class ResetpasswordPage implements OnInit {
       this.http.post(this.apiUrl+"reset-password", JSON.stringify(user), this.httpOptions)
       .subscribe(res => {
         if(res["status"] == 200){
-          localStorage.setItem('token', JSON.stringify(res['data']['api_token']));
+          localStorage.setItem('token', res['data']['api_token']);
           this.toastMessage(res["message"]);
           this.navCtrl.navigateRoot('home');
         }else{

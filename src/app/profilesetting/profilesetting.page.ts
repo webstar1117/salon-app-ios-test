@@ -13,6 +13,7 @@ export class ProfilesettingPage implements OnInit {
   fname: string;
   lname: string;
   phone: string;
+  isPhone: boolean = true;
   avatar: any;
   avatarUrl = 'assets/imgs/user.png';
   
@@ -47,26 +48,47 @@ export class ProfilesettingPage implements OnInit {
     });
   }
 
-  saveProfile(){
-    var user = {
-      api_token: localStorage.getItem('token'),
-      firstname: this.fname,
-      lastname: this.lname,
-      phone: this.phone
+  phoneCheck(){
+    var regexp = new RegExp("^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}");
+    return regexp.test(this.phone);
+  }
+
+  edit(ev){
+    this.phone = ev.target.value;
+    if(this.phone.length == 3){
+      this.phone += " ";
+    }else if(this.phone.length == 7){
+      this.phone += " ";
     }
-    this.http.post(this.apiUrl+"profile/update", JSON.stringify(user), this.httpOptions)
-    .subscribe(res => {
-      if(res["status"] == 200){
-        this.toastMessage(res["message"]);
-        this.navCtrl.navigateBack('profile');
-      }else{
-        for(let key in res["message"]){
-          this.toastMessage(res["message"][key]);
-        }
+  }
+
+  saveProfile(){
+    if(!this.phoneCheck()){
+      this.isPhone = false
+    }else{
+      this.isPhone = true;
+    }
+    if(this.isPhone){
+      var user = {
+        api_token: localStorage.getItem('token'),
+        firstname: this.fname,
+        lastname: this.lname,
+        phone: this.phone
       }
-    }, (err) => {
-      console.log(err);
-    });
+      this.http.post(this.apiUrl+"profile/update", JSON.stringify(user), this.httpOptions)
+      .subscribe(res => {
+        if(res["status"] == 200){
+          this.toastMessage(res["message"]);
+          this.navCtrl.navigateBack('profile');
+        }else{
+          for(let key in res["message"]){
+            this.toastMessage(res["message"][key]);
+          }
+        }
+      }, (err) => {
+        console.log(err);
+      });
+    }
   }
 
   async changeImage(){
@@ -81,7 +103,7 @@ export class ProfilesettingPage implements OnInit {
 
     modal.onDidDismiss()
     .then((data:any) => {
-      this.getProfile();
+      this.avatarUrl = data.data.avatarUrl;
     });
     
     return await modal.present();

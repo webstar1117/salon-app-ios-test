@@ -57,9 +57,6 @@ export class AddprofessionalPage implements OnInit {
     });
   }
 
-  preview(){
-    this.navCtrl.navigateForward('portfolio')
-  }
 
   segmentChanged(category)
   {
