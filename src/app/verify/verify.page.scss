@@ -56,6 +56,15 @@ ion-content
     .the-form
     {
         margin-top: 20px;
+
+        .error
+        {
+            margin: 0;
+            font-size: 12px;
+            font-family: 'PoppinsLight';
+            color: #EE0004;
+        }
+        
         .input-item
         {
             ion-col

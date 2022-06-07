@@ -47,13 +47,11 @@ export class AddclientPage implements OnInit {
       this.phone += " ";
     }else if(this.phone.length == 7){
       this.phone += " ";
-    }else{
-      
     }
   }
 
   phoneCheck(){
-    var regexp = new RegExp("^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}");
+    var regexp = new RegExp(/^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}$/);
     return regexp.test(this.phone);
   }
 

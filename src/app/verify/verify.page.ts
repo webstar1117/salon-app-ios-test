@@ -16,6 +16,7 @@ export class VerifyPage implements OnInit {
   phone: string;
   birth: string;
   ssn: any;
+  isPhone: boolean = true;
   
   apiUrl = 'https://hairday.app/api/';
   httpOptions = {
@@ -48,16 +49,37 @@ export class VerifyPage implements OnInit {
       console.log(err);
     });
   }
+
+  edit(ev){
+    this.phone = ev.target.value;
+    if(this.phone.length == 3){
+      this.phone += " ";
+    }else if(this.phone.length == 7){
+      this.phone += " ";
+    }
+  }
+
+  phoneCheck(){
+    var regexp = new RegExp(/^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}$/);
+    return regexp.test(this.phone);
+  }
   
   nextStep(){
-    var data = {
-      first_name: this.fname,
-      last_name: this.lname,
-      phone_number: this.phone,
-      date_of_birth: this.birth,
-      last_4_digits: this.ssn
+    if(!this.phoneCheck()){
+      this.isPhone = false
+    }else{
+      this.isPhone = true;
     }
-    this.navCtrl.navigateForward('bankaccount1', {state: {salon_id: this.salon_id, data: data}});    
+    if(this.isPhone){
+      var data = {
+        first_name: this.fname,
+        last_name: this.lname,
+        phone_number: this.phone,
+        date_of_birth: this.birth,
+        last_4_digits: this.ssn
+      }
+      this.navCtrl.navigateForward('bankaccount1', {state: {salon_id: this.salon_id, data: data}});    
+    }
   }
 
   async toastMessage(msg){

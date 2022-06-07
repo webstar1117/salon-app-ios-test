@@ -16,6 +16,7 @@ export class AboutPage implements OnInit {
   website: string;
   instagram: string;
   tiktok: any;
+  isPhone: boolean = true;
   basic_amenities: any;
   basic_safeties: any;
   amenities = [];
@@ -99,31 +100,52 @@ export class AboutPage implements OnInit {
     }
   }
 
-  saveAbout(){
-    var data = {
-      salon_id: this.salon_id,
-      description: this.description,
-      phone: this.phone,
-      website: this.website,
-      instagram: this.instagram,
-      tictok: this.tiktok,
-      amenity_ids: this.amenities,
-      health_and_safety_ids: this.safeties,
-      cancellation_policy: this.policy
+  edit(ev){
+    this.phone = ev.target.value;
+    if(this.phone.length == 3){
+      this.phone += " ";
+    }else if(this.phone.length == 7){
+      this.phone += " ";
     }
-    this.http.post(this.apiUrl+"business/add-about", JSON.stringify(data), this.httpOptions)
-    .subscribe(res => {
-      if(res["status"] == 200){
-        this.toastMessage(res["message"]);
-        this.navCtrl.navigateBack('businessprofile');
-      }else{
+  }
+
+  phoneCheck(){
+    var regexp = new RegExp(/^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}$/);
+    return regexp.test(this.phone);
+  }
+
+  saveAbout(){
+    if(!this.phoneCheck()){
+      this.isPhone = false
+    }else{
+      this.isPhone = true;
+    }
+    if(this.isPhone){
+      var data = {
+        salon_id: this.salon_id,
+        description: this.description,
+        phone: this.phone,
+        website: this.website,
+        instagram: this.instagram,
+        tictok: this.tiktok,
+        amenity_ids: this.amenities,
+        health_and_safety_ids: this.safeties,
+        cancellation_policy: this.policy
+      }
+      this.http.post(this.apiUrl+"business/add-about", JSON.stringify(data), this.httpOptions)
+      .subscribe(res => {
+        if(res["status"] == 200){
+          this.toastMessage(res["message"]);
+          this.navCtrl.navigateBack('businessprofile');
+        }else{
           for(let key in res["message"]){
             this.toastMessage(res["message"][key]);
           }
-      }
-    }, (err) => {
-      console.log(err);
-    });
+        }
+      }, (err) => {
+        console.log(err);
+      });
+    }
   }
 
   async toastMessage(msg){

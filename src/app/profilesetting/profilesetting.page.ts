@@ -49,7 +49,7 @@ export class ProfilesettingPage implements OnInit {
   }
 
   phoneCheck(){
-    var regexp = new RegExp("^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}");
+    var regexp = new RegExp(/^[0-9]{3}[- ][0-9]{3}[- ][0-9]{4}$/);
     return regexp.test(this.phone);
   }
 
