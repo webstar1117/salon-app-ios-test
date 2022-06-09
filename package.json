@@ -24,6 +24,7 @@
     "@awesome-cordova-plugins/camera": "^5.43.0",
     "@awesome-cordova-plugins/core": "^5.39.1",
     "@awesome-cordova-plugins/facebook": "^5.40.0",
+    "@awesome-cordova-plugins/stripe": "^5.39.1",
     "@capacitor/app": "1.0.2",
     "@capacitor/core": "3.1.2",
     "@capacitor/haptics": "1.0.2",
@@ -48,6 +49,7 @@
     "cordova-plugin-inappbrowser": "^5.0.0",
     "cordova-plugin-nativegeocoder": "^3.4.1",
     "cordova-plugin-sign-in-with-apple": "^0.1.2",
+    "cordova-plugin-stripe": "^1.5.3",
     "date-fns": "^2.28.0",
     "firebase": "^7.5.0",
     "flipclock": "^0.7.8",
@@ -121,6 +123,7 @@
       },
       "cordova-plugin-sign-in-with-apple": {},
       "cordova-plugin-applepay": {},
+      "cordova-plugin-stripe": {},
       "cordova-plugin-facebook-connect": {
         "APP_ID": "1003844693883642",
         "APP_NAME": "hairday",

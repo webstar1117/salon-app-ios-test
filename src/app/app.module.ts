@@ -18,6 +18,8 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 import { Camera } from '@awesome-cordova-plugins/camera/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { Stripe } from '@awesome-cordova-plugins/stripe/ngx';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,7 +32,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
   AngularFireModule.initializeApp(environment.firebaseConfig),  
   AngularFirestoreModule,        
 ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay , Camera, InAppBrowser],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay ,Stripe, Camera, InAppBrowser],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
