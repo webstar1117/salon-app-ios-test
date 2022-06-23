@@ -2,10 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, ModalController, NavParams, ToastController, LoadingController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CalendarMode, Step } from 'ionic2-calendar/calendar';
-import { ApplePay } from '@ionic-native/apple-pay/ngx'
-import { Stripe } from '@awesome-cordova-plugins/stripe/ngx';
 import { PaymentmodalPage } from '../paymentmodal/paymentmodal.page';
-
+declare var cordova;
 @Component({
   selector: 'app-appointmentmodal',
   templateUrl: './appointmentmodal.page.html',
@@ -59,8 +57,6 @@ export class AppointmentmodalPage implements OnInit {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private http: HttpClient,
-    private applePay: ApplePay,
-    private stripe: Stripe,
   ) { }
 
   ngOnInit() {
@@ -240,143 +236,112 @@ export class AppointmentmodalPage implements OnInit {
     }
   }
 
-  completeApplePay(resp) {
-    const _this = this;
+  completeApplePay(resp) 
+  {
 
-    return new Promise((resolution, rejection) => {
-      $.post({
-        url: 'https://api.stripe.com/v1/tokens',
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("Authorization", "Bearer pk_test_51JwyVGEDfScRvyn3VD4lrKiNBkdBVvFZjV1XKQeKcBWBUr6Yp9kAIf3dsqWmeXLLkCeufUJmTuVGFlY95Kirakv300Czfe5zDT")
-        },
-        data: {
-          pk_token: atob(resp.paymentData),
-          pk_token_payment_network: resp.paymentMethodNetwork,
-          pk_token_instrument_name: resp.paymentMethodDisplayName,
-          pk_token_transaction_id: resp.transactionIdentifier
-        },
-        success: function (data) {
-          resolution({
-            token: data.id
-          });
-        }
-      });
-    });
+
   }
 
   async applePayment() {
-    try {
-      const message = await this.applePay.canMakePayments();
-      this.toastMessage(message);
-      let order: any = {
-        items: [
-          { label: 'Service', amount: this.orginal_price },
-          { label: 'Tip', amount: this.tip_price },
-          { label: 'Beauty Salon', amount: this.total_price }
-        ],
-        shippingMethods: [],
-        merchantIdentifier: 'merchant.hairday.hairday', /* The merchant ID registered in Apple developer account */
-        currencyCode: 'USD',
-        countryCode: 'US',
-        billingAddressRequirement: ['name', 'email', 'phone'],
-        shippingAddressRequirement: 'none',
-        shippingType: 'none',
-        merchantCapabilities: ['3ds', 'debit', 'credit'], /* The payment capabilities supported by the merchant. */
-        supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
-        /* The list of payment networks supported by the merchant. */
-        total: { label: 'HAIR DAY, INC.', amount: this.total_price, type: "final" }
-      }
-
-      await this.applePay.makePaymentRequest(order).then(resp => {
-        this.completeApplePay(resp).then((stripeToken: any) => {
-          // code goes here to store order in database etc
-          this.stripe.setPublishableKey('pk_test_51JwyVGEDfScRvyn3VD4lrKiNBkdBVvFZjV1XKQeKcBWBUr6Yp9kAIf3dsqWmeXLLkCeufUJmTuVGFlY95Kirakv300Czfe5zDT');
-
-          var params = {
-            stripeToken,
-            amount: this.total_price
-          };
-
-          this.http.post(this.apiUrl + "stripe-payment-test", JSON.stringify(params), this.httpOptions)
-            .subscribe(res => {
-              if (res["status"] == 200) {
-                if (res["data"][0].status == "succeeded") {
-                  if (this.multi == false) {
-                    var data = {
-                      api_token: localStorage.getItem('token'),
-                      professional_id: this.professional_id,
-                      service_id: this.service_id,
-                      salon_id: this.salon_id,
-                      year: this.date.toLocaleDateString("en-US", { year: 'numeric' }),
-                      month: this.date.toLocaleDateString("en-US", { month: 'long' }),
-                      date: this.date.toLocaleDateString("en-US", { day: 'numeric' }),
-                      day: this.date.toLocaleDateString("en-US", { weekday: 'long' }),
-                      time: this.datas[0].time,
-                      price: this.orginal_price,
-                      tip: this.tip_price,
-                      tax: 0
-                    }
-                    this.http.post(this.apiUrl + "appointment/add", JSON.stringify(data), this.httpOptions)
-                      .subscribe(res => {
-                        if (res["status"] == 200) {
-                          this.paymentSuccess();
-                          this.modalCtrl.dismiss();
-                        } else {
-                          for (let key in res["message"]) {
-                            this.toastMessage(res["message"][key]);
-                          }
-                        }
-                      }, (err) => {
-                        console.log(err);
-                      });
-                  } else {
-                    let multidata = [];
-                    for (var i in this.datas) {
-                      let data = {
-                        professional_id: this.datas[i]["professional"]["id"],
-                        service_id: this.datas[i]["service"]["id"],
-                        salon_id: this.datas[i]["service"]["salon_id"],
-                        year: this.datas[i]["date"].toLocaleDateString("en-US", { year: 'numeric' }),
-                        month: this.datas[i]["date"].toLocaleDateString("en-US", { month: 'long' }),
-                        date: this.datas[i]["date"].toLocaleDateString("en-US", { day: 'numeric' }),
-                        day: this.datas[i]["date"].toLocaleDateString("en-US", { weekday: 'long' }),
-                        time: this.datas[i].time,
-                        price: this.datas[i]["service"]["price"],
-                        tip: this.tip_price,
-                        tax: 0
-                      }
-                      multidata.push(data);
-                    }
-                    let requestData = {
-                      api_token: localStorage.getItem('token'),
-                      data: multidata
-                    }
-                    this.http.post(this.apiUrl + "appointment/add-multi", JSON.stringify(requestData), this.httpOptions)
-                      .subscribe(res => {
-                        if (res["status"] == 200) {
-                          this.paymentSuccess();
-                          this.modalCtrl.dismiss();
-                        } else {
-                          for (let key in res["message"]) {
-                            this.toastMessage(res["message"][key]);
-                          }
-                        }
-                      }, (err) => {
-                        console.log(err);
-                      });
+    try 
+    {
+    let exititself=true;
+    let totalpricestripe = this.total_price*100;
+    let browser = cordova.InAppBrowser.open("https://watheercare.com/testpay/payment.php?total="+totalpricestripe,"_blank","location=yes,zoom=no,hideurlbar=yes,toolbarcolor=#58B1AE,hidenavigationbuttons=yes,closebuttoncolor=#ffffff,closebuttoncaption=Done");
+    browser.addEventListener('loadstart',async event=>
+      { 
+        if (event.url.includes("success")) {
+          exititself=false;  
+          browser.close();   
+         const loading = await this.loadingCtrl.create({
+         spinner: 'bubbles',
+          cssClass: 'loading',
+         message: 'Checking...',
+          });
+          loading.present();
+          if (this.multi == false) {
+            var data = {
+              api_token: localStorage.getItem('token'),
+              professional_id: this.professional_id,
+              service_id: this.service_id,
+              salon_id: this.salon_id,
+              year: this.date.toLocaleDateString("en-US", { year: 'numeric' }),
+              month: this.date.toLocaleDateString("en-US", { month: 'long' }),
+              date: this.date.toLocaleDateString("en-US", { day: 'numeric' }),
+              day: this.date.toLocaleDateString("en-US", { weekday: 'long' }),
+              time: this.datas[0].time,
+              price: this.orginal_price,
+              tip: this.tip_price,
+              tax: 0
+            }
+            this.http.post(this.apiUrl + "appointment/add", JSON.stringify(data), this.httpOptions)
+              .subscribe(res => {
+                loading.dismiss();
+                if (res["status"] == 200) {
+                  this.paymentSuccess();
+                  this.modalCtrl.dismiss();
+                } else {
+                  for (let key in res["message"]) {
+                    this.toastMessage(res["message"][key]);
                   }
                 }
-              } else {
-                this.toastMessage(res["message"]);
+              }, (err) => {
+                loading.dismiss();
+                console.log(err);
+              });
+          } else {
+            let multidata = [];
+            for (var i in this.datas) {
+              let data = {
+                professional_id: this.datas[i]["professional"]["id"],
+                service_id: this.datas[i]["service"]["id"],
+                salon_id: this.datas[i]["service"]["salon_id"],
+                year: this.datas[i]["date"].toLocaleDateString("en-US", { year: 'numeric' }),
+                month: this.datas[i]["date"].toLocaleDateString("en-US", { month: 'long' }),
+                date: this.datas[i]["date"].toLocaleDateString("en-US", { day: 'numeric' }),
+                day: this.datas[i]["date"].toLocaleDateString("en-US", { weekday: 'long' }),
+                time: this.datas[i].time,
+                price: this.datas[i]["service"]["price"],
+                tip: this.tip_price,
+                tax: 0
               }
-            }, (err) => {
-              console.log(err);
-            });
-        })
-      });
+              multidata.push(data);
+            }
+            let requestData = {
+              api_token: localStorage.getItem('token'),
+              data: multidata
+            }
+            this.http.post(this.apiUrl + "appointment/add-multi", JSON.stringify(requestData), this.httpOptions)
+              .subscribe(res => {
+                loading.dismiss();
+                if (res["status"] == 200) {
+                  this.paymentSuccess();
+                  this.modalCtrl.dismiss();
+                } else {
+                  for (let key in res["message"]) {
+                    this.toastMessage(res["message"][key]);
+                  }
+                }
+              }, (err) => {
+                loading.dismiss();
+                console.log(err);
+              });
+          }
+        }
+        else if (event.url.includes("error")) 
+        {
+          exititself=false;
+          browser.close();
+          this.toastMessage("Failed To Charge Payment");
+        }
 
-      await this.applePay.completeLastTransaction('success');
-
+      })
+      browser.addEventListener('exit',() => {
+        if(exititself)
+        this.toastMessage("Failed To Charge Payment");
+      }, err => {
+        console.error(err);
+      });     
     } catch (error) {
       this.toastMessage(error);
     }
@@ -386,128 +351,7 @@ export class AppointmentmodalPage implements OnInit {
 
 
   async visaPay() {
-    this.stripe.setPublishableKey('pk_test_51JwyVGEDfScRvyn3VD4lrKiNBkdBVvFZjV1XKQeKcBWBUr6Yp9kAIf3dsqWmeXLLkCeufUJmTuVGFlY95Kirakv300Czfe5zDT');
-    // this.stripe.setPublishableKey('pk_live_51JwyVGEDfScRvyn3j8YQM4l9uTTKZlz0TLWacwe9eXH7mc5KDBlVSk99nuoL8BhQDb7N0dtNpGRy0ayilZ7p2v3R00ODJoMc4F');
-    var token = localStorage.getItem('token');
-    let card;
 
-    const loading = await this.loadingCtrl.create({
-      spinner: 'bubbles',
-      cssClass: 'loading',
-      message: 'Checking...',
-    });
-    loading.present();
-
-    this.http.get(this.apiUrl + "card/get-default?api_token=" + token)
-      .subscribe(res => {
-        if (res["status"] == 200) {
-          if (res["data"] != null) {
-            var expire = res["data"].expired_at;
-            expire = expire.split("/");
-            card = {
-              number: res["data"].number,
-              expMonth: expire[0],
-              expYear: "20" + expire[1],
-              cvc: res["data"].last_digit
-            }
-            this.stripe.createCardToken(card)
-              .then((token) => {
-                var params = {
-                  stripeToken: token.id,
-                  amount: this.total_price
-                };
-                this.http.post(this.apiUrl + "stripe-payment-test", JSON.stringify(params), this.httpOptions)
-                  .subscribe(res => {
-                    if (res["status"] == 200) {
-                      if (res["data"][0].status == "succeeded") {
-                        if (this.multi == false) {
-                          var data = {
-                            api_token: localStorage.getItem('token'),
-                            professional_id: this.professional_id,
-                            service_id: this.service_id,
-                            salon_id: this.salon_id,
-                            year: this.date.toLocaleDateString("en-US", { year: 'numeric' }),
-                            month: this.date.toLocaleDateString("en-US", { month: 'long' }),
-                            date: this.date.toLocaleDateString("en-US", { day: 'numeric' }),
-                            day: this.date.toLocaleDateString("en-US", { weekday: 'long' }),
-                            time: this.datas[0].time,
-                            price: this.orginal_price,
-                            tip: this.tip_price,
-                            tax: 0
-                          }
-                          this.http.post(this.apiUrl + "appointment/add", JSON.stringify(data), this.httpOptions)
-                            .subscribe(res => {
-                              loading.dismiss();
-                              if (res["status"] == 200) {
-                                this.paymentSuccess();
-                                this.modalCtrl.dismiss();
-                              } else {
-                                for (let key in res["message"]) {
-                                  this.toastMessage(res["message"][key]);
-                                }
-                              }
-                            }, (err) => {
-                              console.log(err);
-                            });
-                        } else {
-                          let multidata = [];
-                          for (var i in this.datas) {
-                            let data = {
-                              professional_id: this.datas[i]["professional"]["id"],
-                              service_id: this.datas[i]["service"]["id"],
-                              salon_id: this.datas[i]["service"]["salon_id"],
-                              year: this.datas[i]["date"].toLocaleDateString("en-US", { year: 'numeric' }),
-                              month: this.datas[i]["date"].toLocaleDateString("en-US", { month: 'long' }),
-                              date: this.datas[i]["date"].toLocaleDateString("en-US", { day: 'numeric' }),
-                              day: this.datas[i]["date"].toLocaleDateString("en-US", { weekday: 'long' }),
-                              time: this.datas[i].time,
-                              price: this.datas[i]["service"]["price"],
-                              tip: this.tip_price,
-                              tax: 0
-                            }
-                            multidata.push(data);
-                          }
-                          let requestData = {
-                            api_token: localStorage.getItem('token'),
-                            data: multidata
-                          }
-                          this.http.post(this.apiUrl + "appointment/add-multi", JSON.stringify(requestData), this.httpOptions)
-                            .subscribe(res => {
-                              loading.dismiss();
-                              if (res["status"] == 200) {
-                                this.paymentSuccess();
-                                this.modalCtrl.dismiss();
-                              } else {
-                                for (let key in res["message"]) {
-                                  this.toastMessage(res["message"][key]);
-                                }
-                              }
-                            }, (err) => {
-                              console.log(err);
-                            });
-                        }
-                      }
-                    } else {
-                      this.toastMessage(res["message"]);
-                      loading.dismiss();
-                    }
-                  }, (err) => {
-                    console.log(err);
-                    loading.dismiss();
-                  });
-              }).catch(error => console.log(error));
-          } else {
-            this.toastMessage('You set no card as a default.');
-            loading.dismiss();
-          }
-        } else {
-          this.toastMessage('You set no card as a default.')
-          loading.dismiss();
-        }
-      }, (err) => {
-        console.log(err);
-        loading.dismiss();
-      });
   }
 
   async paymentSuccess() {
