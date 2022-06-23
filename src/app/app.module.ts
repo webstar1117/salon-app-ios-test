@@ -31,7 +31,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
   AngularFireModule.initializeApp(environment.firebaseConfig),  
   AngularFirestoreModule,        
 ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay ,Stripe, Camera, InAppBrowser],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy}, Geolocation, NativeGeocoder, NavParams, ApplePay , Camera, InAppBrowser],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
