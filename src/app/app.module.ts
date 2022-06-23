@@ -18,7 +18,6 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 import { Camera } from '@awesome-cordova-plugins/camera/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { Stripe } from '@awesome-cordova-plugins/stripe/ngx';
 
 
 @NgModule({
