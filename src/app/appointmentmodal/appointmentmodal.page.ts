@@ -247,7 +247,7 @@ export class AppointmentmodalPage implements OnInit {
     {
     let exititself=true;
     let totalpricestripe = this.total_price*100;
-    let browser = cordova.InAppBrowser.open("https://watheercare.com/testpay/payment.php?total="+totalpricestripe,"_blank","location=yes,zoom=no,hideurlbar=yes,toolbarcolor=#58B1AE,hidenavigationbuttons=yes,closebuttoncolor=#ffffff,closebuttoncaption=Done");
+    let browser = cordova.InAppBrowser.open("https://hairday.app/apple-pay/payment.php?total="+totalpricestripe,"_blank","location=yes,zoom=no,hideurlbar=yes,toolbarcolor=#000000,hidenavigationbuttons=yes,closebuttoncolor=#ffffff,closebuttoncaption=Done");
     browser.addEventListener('loadstart',async event=>
       { 
         if (event.url.includes("success")) {
